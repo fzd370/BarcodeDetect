@@ -27,26 +27,27 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TextView txtView = (TextView) findViewById(R.id.txtContent);
+                ImageView myImageView = (ImageView) findViewById(R.id.imgview);
+                Bitmap myBitmap = BitmapFactory.decodeResource(
+                        getApplicationContext().getResources(),
+                        R.drawable.puppy);
+                myImageView.setImageBitmap(myBitmap);
+
+                BarcodeDetector detector =
+                        new BarcodeDetector.Builder(getApplicationContext())
+                                .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
+                                .build();
+                if(!detector.isOperational()){
+                    txtView.setText("Could not set up the detector!");
+                    return;
+                }
+                Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
+                SparseArray<Barcode> barcodes = detector.detect(frame);
+                Barcode thisCode = barcodes.valueAt(0);
+                txtView.setText(thisCode.rawValue);
             }
         });
-        TextView txtView = (TextView) findViewById(R.id.txtContent);
-        ImageView myImageView = (ImageView) findViewById(R.id.imgview);
-        Bitmap myBitmap = BitmapFactory.decodeResource(
-                getApplicationContext().getResources(),
-                R.drawable.puppy);
-        myImageView.setImageBitmap(myBitmap);
 
-        BarcodeDetector detector =
-                new BarcodeDetector.Builder(getApplicationContext())
-                        .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
-                        .build();
-        if(!detector.isOperational()){
-            txtView.setText("Could not set up the detector!");
-            return;
-        }
-        Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
-        SparseArray<Barcode> barcodes = detector.detect(frame);
-        Barcode thisCode = barcodes.valueAt(0);
-        txtView.setText(thisCode.rawValue);
     }
 }
